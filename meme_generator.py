@@ -27,7 +27,7 @@ def generate_meme(template_id, text_top, text_bottom):
 
 if __name__ == "__main__":
     template_id = 61579  # Replace with the template ID of the meme you want to use
-    text_top = "Top text"
+    text_top = "Text at the top"
     text_bottom = "Bottom text"
 
     meme_url = generate_meme(template_id, text_top, text_bottom)
