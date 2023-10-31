@@ -21,7 +21,7 @@ if response.status_code == 200:
         for index, headline in enumerate(headlines, 1):
             print(f"{index}. {headline.text}")
     else:
-        print("No headlines found on the website.")
+        print("No headlines could be parsed from the website.")
 
 else:
     print("Failed to retrieve the web page. Status code:", response.status_code)
