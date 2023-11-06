@@ -33,6 +33,10 @@ def copy_password():
     if password:
         pyperclip.copy(password)
 
+def clear_password():
+    password_var.set("")
+    length_entry.delete(0, tk.END)
+
 root = tk.Tk()
 root.title("Password Generator")
 
@@ -58,7 +62,10 @@ generate_button = ttk.Button(frame, text="Generate Password", command=generate_p
 generate_button.grid(row=2, column=0, columnspan=2, pady=10)
 
 copy_button = ttk.Button(frame, text="Copy Password", command=copy_password)
-copy_button.grid(row=3, column=0, columnspan=2, pady=10)
+copy_button.grid(row=3, column=0, pady=10)
+
+clear_button = ttk.Button(frame, text="Clear", command=clear_password)
+clear_button.grid(row=3, column=1, pady=10)
 
 lowercase_var = tk.BooleanVar()
 uppercase_var = tk.BooleanVar()
