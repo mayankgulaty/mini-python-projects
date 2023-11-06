@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import random
 import string
+import pyperclip
 
 def generate_password():
     password_length = int(length_entry.get())
@@ -27,6 +28,11 @@ def generate_password():
     else:
         password_var.set("Select at least one character type")
 
+def copy_password():
+    password = password_var.get()
+    if password:
+        pyperclip.copy(password)
+
 root = tk.Tk()
 root.title("Password Generator")
 
@@ -51,6 +57,9 @@ password_display.grid(row=1, column=1, padx=5)
 generate_button = ttk.Button(frame, text="Generate Password", command=generate_password)
 generate_button.grid(row=2, column=0, columnspan=2, pady=10)
 
+copy_button = ttk.Button(frame, text="Copy Password", command=copy_password)
+copy_button.grid(row=3, column=0, columnspan=2, pady=10)
+
 lowercase_var = tk.BooleanVar()
 uppercase_var = tk.BooleanVar()
 digits_var = tk.BooleanVar()
@@ -61,9 +70,9 @@ uppercase_checkbox = ttk.Checkbutton(frame, text="Uppercase", variable=uppercase
 digits_checkbox = ttk.Checkbutton(frame, text="Digits", variable=digits_var)
 symbols_checkbox = ttk.Checkbutton(frame, text="Symbols", variable=symbols_var)
 
-lowercase_checkbox.grid(row=3, column=0, sticky="w")
-uppercase_checkbox.grid(row=4, column=0, sticky="w")
-digits_checkbox.grid(row=5, column=0, sticky="w")
-symbols_checkbox.grid(row=6, column=0, sticky="w")
+lowercase_checkbox.grid(row=4, column=0, sticky="w")
+uppercase_checkbox.grid(row=5, column=0, sticky="w")
+digits_checkbox.grid(row=6, column=0, sticky="w")
+symbols_checkbox.grid(row=7, column=0, sticky="w")
 
 root.mainloop()
