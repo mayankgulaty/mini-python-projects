@@ -17,6 +17,26 @@ def convert_text():
     output_text.delete("1.0", "end")
     output_text.insert("1.0", converted_text)
 
+def remove_extra_spaces():
+    text = input_text.get("1.0", "end-1c")
+    cleaned_text = ' '.join(text.split())
+    input_text.delete("1.0", "end")
+    input_text.insert("1.0", cleaned_text)
+
+def find_and_replace():
+    find_text = find_entry.get()
+    replace_text = replace_entry.get()
+    text = input_text.get("1.0", "end-1c")
+    replaced_text = text.replace(find_text, replace_text)
+    input_text.delete("1.0", "end")
+    input_text.insert("1.0", replaced_text)
+
+def clear_text():
+    input_text.delete("1.0", "end")
+    output_text.delete("1.0", "end")
+    find_entry.delete(0, tk.END)
+    replace_entry.delete(0, tk.END)
+
 root = tk.Tk()
 root.title("Text Case Converter")
 
@@ -53,5 +73,24 @@ sentencecase_radio.grid(row=8, column=0, sticky="w")
 
 convert_button = ttk.Button(frame, text="Convert Text", command=convert_text)
 convert_button.grid(row=9, column=0, pady=10)
+
+space_button = ttk.Button(frame, text="Remove Extra Spaces", command=remove_extra_spaces)
+space_button.grid(row=10, column=0, pady=5)
+
+find_label = ttk.Label(frame, text="Find:")
+find_label.grid(row=11, column=0, sticky="w")
+find_entry = ttk.Entry(frame)
+find_entry.grid(row=11, column=1, padx=5)
+
+replace_label = ttk.Label(frame, text="Replace with:")
+replace_label.grid(row=12, column=0, sticky="w")
+replace_entry = ttk.Entry(frame)
+replace_entry.grid(row=12, column=1, padx=5)
+
+find_replace_button = ttk.Button(frame, text="Find and Replace", command=find_and_replace)
+find_replace_button.grid(row=13, column=0, pady=5)
+
+clear_button = ttk.Button(frame, text="Clear", command=clear_text)
+clear_button.grid(row=13, column=1, pady=5)
 
 root.mainloop()
