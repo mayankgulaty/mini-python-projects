@@ -1,52 +1,75 @@
-import tkinter as tk
+import pygame
 import random
-import time
+import sys
 
-class BubbleSortAnimation:
-    def __init__(self, master, array_size=20):
-        self.master = master
-        self.master.title("Bubble Sort Animation")
-        self.canvas = tk.Canvas(self.master, width=600, height=400)
-        self.canvas.pack()
+# Initialize Pygame
+pygame.init()
 
-        self.array = [random.randint(10, 300) for _ in range(array_size)]
-        self.rectangles = []
+# Constants
+WIDTH, HEIGHT = 800, 600
+BACKGROUND_COLOR = (255, 255, 255)
+BAR_COLOR = (0, 0, 255)
+SWAP_COLOR = (255, 0, 0)
+FPS = 60
 
-        self.draw_rectangles()
+# Function to draw bars
+def draw_bars(screen, bars, highlight=None):
+    screen.fill(BACKGROUND_COLOR)
+    for i, height in enumerate(bars):
+        color = BAR_COLOR
+        if highlight and (i == highlight[0] or i == highlight[1]):
+            color = SWAP_COLOR
+        pygame.draw.rect(screen, color, (i * (WIDTH // len(bars)), HEIGHT - height, WIDTH // len(bars), height))
 
-        self.start_button = tk.Button(self.master, text="Start Sorting", command=self.bubble_sort)
-        self.start_button.pack()
+# Bubble Sort Algorithm
+def bubble_sort(bars, screen):
+    n = len(bars)
+    for i in range(n):
+        for j in range(0, n-i-1):
+            # Draw bars with highlight for comparison
+            draw_bars(screen, bars, highlight=(j, j+1))
+            pygame.display.flip()
+            pygame.time.delay(50)  # Delay for visualization
 
-    def draw_rectangles(self):
-        for i, height in enumerate(self.array):
-            x1, y1 = i * 30 + 10, 400
-            x2, y2 = x1 + 20, 400 - height
-            rect = self.canvas.create_rectangle(x1, y1, x2, y2, fill="blue")
-            self.rectangles.append(rect)
+            if bars[j] > bars[j+1]:
+                # Swap bars
+                bars[j], bars[j+1] = bars[j+1], bars[j]
+                # Draw bars with highlight for swap
+                draw_bars(screen, bars, highlight=(j, j+1))
+                pygame.display.flip()
+                pygame.time.delay(50)  # Delay for visualization
 
-    def update_rectangles(self):
-        for i, rect in enumerate(self.rectangles):
-            height = self.array[i]
-            x1, y1 = i * 30 + 10, 400
-            x2, y2 = x1 + 20, 400 - height
-            self.canvas.coords(rect, x1, y1, x2, y2)
+# Main function
+def main():
+    # Generate random bar heights
+    bars = [random.randint(50, 500) for _ in range(50)]
 
-    def bubble_sort(self):
-        n = len(self.array)
+    # Create Pygame window
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("Bubble Sort Visualization")
 
-        for i in range(n):
-            for j in range(0, n - i - 1):
-                if self.array[j] > self.array[j + 1]:
-                    self.array[j], self.array[j + 1] = self.array[j + 1], self.array[j]
+    # Main loop
+    running = True
+    clock = pygame.time.Clock()
 
-                    # Update the rectangles to show the swapping
-                    self.update_rectangles()
-                    self.master.update()
-                    time.sleep(0.1)
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
 
-# Create the main window
-root = tk.Tk()
-app = BubbleSortAnimation(root)
+        # Run bubble sort algorithm
+        bubble_sort(bars, screen)
 
-# Run the application
-root.mainloop()
+        # Draw final state
+        draw_bars(screen, bars)
+        pygame.display.flip()
+
+        # Wait for user to close the window
+        pygame.time.delay(2000)
+        running = False
+
+    pygame.quit()
+    sys.exit()
+
+if __name__ == "__main__":
+    main()
