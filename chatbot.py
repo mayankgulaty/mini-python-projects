@@ -1,5 +1,7 @@
 import random
 import nltk
+import wikipediaapi
+import requests
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
@@ -14,6 +16,9 @@ class Chatbot:
         self.memory = {}
         self.stop_words = set(stopwords.words("english"))
         self.lemmatizer = WordNetLemmatizer()
+        self.wiki_wiki = wikipediaapi.Wikipedia("en", headers={"User-Agent": "Chatbot/1.0 (YourContactInformation)"})
+
+
 
     def preprocess_input(self, user_input):
         tokens = word_tokenize(user_input.lower())
@@ -47,6 +52,12 @@ class Chatbot:
             return self.get_favorite_color_response()
         elif "joke" in user_input:
             return self.get_joke_response()
+        elif "weather" in user_input:
+            return self.get_weather_response()
+        elif "tell me about" in user_input:
+            return self.get_wikipedia_response(user_input)
+        elif "recommend a book" in user_input:
+            return self.get_book_recommendation()
         else:
             return random.choice(compliments)
 
@@ -64,6 +75,32 @@ class Chatbot:
             "Why did the scarecrow win an award? Because he was outstanding in his field!"
         ]
         return random.choice(jokes)
+
+    def get_weather_response(self):
+        # Provide a basic weather response (simulated)
+        return "The weather is great today!"
+
+    def get_wikipedia_response(self, user_input):
+        # Extract the topic from the user's input
+        topic = user_input.split("about", 1)[1].strip()
+
+        # Retrieve information from Wikipedia
+        page_py = self.wiki_wiki.page(topic)
+        if page_py.exists():
+            return f"Here's some information about {topic}: {page_py.text[:200]}..."
+        else:
+            return f"Sorry, I couldn't find information about {topic} on Wikipedia."
+
+    def get_book_recommendation(self):
+        # Suggest a random book (simulated)
+        books = [
+            "The Great Gatsby by F. Scott Fitzgerald",
+            "To Kill a Mockingbird by Harper Lee",
+            "1984 by George Orwell",
+            "The Catcher in the Rye by J.D. Salinger",
+            "Pride and Prejudice by Jane Austen"
+        ]
+        return f"I recommend you check out: {random.choice(books)}"
 
 
 def chat():
