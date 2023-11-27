@@ -1,10 +1,10 @@
 import random
 import nltk
 import wikipediaapi
-import requests
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
+from newsapi import NewsApiClient
 
 nltk.download("punkt")
 nltk.download("stopwords")
@@ -17,8 +17,7 @@ class Chatbot:
         self.stop_words = set(stopwords.words("english"))
         self.lemmatizer = WordNetLemmatizer()
         self.wiki_wiki = wikipediaapi.Wikipedia("en", headers={"User-Agent": "Chatbot/1.0 (YourContactInformation)"})
-
-
+        self.newsapi = NewsApiClient(api_key="YOUR_NEWS_API_KEY")  # Replace with your News API key
 
     def preprocess_input(self, user_input):
         tokens = word_tokenize(user_input.lower())
@@ -58,6 +57,12 @@ class Chatbot:
             return self.get_wikipedia_response(user_input)
         elif "recommend a book" in user_input:
             return self.get_book_recommendation()
+        elif "news" in user_input:
+            return self.get_news_headlines()
+        elif "recommend a movie" in user_input:
+            return self.get_movie_recommendation()
+        elif "what is" in user_input or "who is" in user_input:
+            return self.get_general_knowledge_response(user_input)
         else:
             return random.choice(compliments)
 
@@ -101,6 +106,37 @@ class Chatbot:
             "Pride and Prejudice by Jane Austen"
         ]
         return f"I recommend you check out: {random.choice(books)}"
+
+    def get_news_headlines(self):
+        # Retrieve the latest news headlines
+        news_headlines = self.newsapi.get_top_headlines(country="us", language="en")
+        if "articles" in news_headlines and len(news_headlines["articles"]) > 0:
+            headlines = [article["title"] for article in news_headlines["articles"][:5]]
+            return "Here are some top headlines:\n" + "\n".join(headlines)
+        else:
+            return "Sorry, I couldn't retrieve the latest news headlines."
+
+    def get_movie_recommendation(self):
+        # Suggest a random movie (simulated)
+        movies = [
+            "The Shawshank Redemption",
+            "The Godfather",
+            "Pulp Fiction",
+            "The Dark Knight",
+            "Schindler's List"
+        ]
+        return f"I recommend you watch: {random.choice(movies)}"
+
+    def get_general_knowledge_response(self, user_input):
+        # Extract the topic from the user's input
+        topic = user_input.split("is", 1)[1].strip()
+
+        # Retrieve a summary from Wikipedia
+        page_py = self.wiki_wiki.page(topic)
+        if page_py.exists():
+            return f"Here's a summary about {topic}: {page_py.text[:200]}..."
+        else:
+            return f"Sorry, I couldn't find information about {topic} on Wikipedia."
 
 
 def chat():
