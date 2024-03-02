@@ -1,35 +1,56 @@
-class WaterIntakeTracker:
-    def __init__(self):
-        self.total_intake = 0
-        self.goal = 2000  # default goal in milliliters
+import json
+import os
+from datetime import datetime
 
-    def log_intake(self, amount):
-        self.total_intake += amount
-        print(f"Logged {amount} ml. Total for today: {self.total_intake} ml.")
+def load_intake_log(filename='water_intake.json'):
+    if os.path.exists(filename):
+        with open(filename, 'r') as file:
+            return json.load(file)
+    return {"goal": 0, "logs": {}}
 
-    def set_goal(self, goal_amount):
-        self.goal = goal_amount
-        print(f"Daily goal set to {self.goal} ml.")
+def save_intake_log(data, filename='water_intake.json'):
+    with open(filename, 'w') as file:
+        json.dump(data, file, indent=4)
 
-    def check_goal(self):
-        if self.total_intake >= self.goal:
-            print("Congratulations! You've reached your daily water intake goal.")
-        else:
-            print(f"You are {self.goal - self.total_intake} ml away from your goal.")
+def set_daily_goal(data):
+    goal = float(input("Enter your daily water intake goal (in liters): "))
+    data["goal"] = goal
+    save_intake_log(data)
+    print(f"Daily water intake goal set to {goal} liters.")
+
+def log_water_intake(data):
+    date = datetime.now().strftime('%Y-%m-%d')
+    amount = float(input("Enter the amount of water consumed (in liters): "))
+    if date not in data["logs"]:
+        data["logs"][date] = 0.0
+    data["logs"][date] += amount
+    save_intake_log(data)
+    print(f"Logged {amount} liters of water.")
+
+def view_progress(data):
+    date = datetime.now().strftime('%Y-%m-%d')
+    intake = data["logs"].get(date, 0)
+    print(f"\nToday's Water Intake: {intake} liters")
+    print(f"Daily Goal: {data['goal']} liters")
+    if intake >= data["goal"]:
+        print("Congratulations! You've reached your daily goal.")
+    else:
+        print(f"You're {data['goal'] - intake} liters away from your daily goal.")
 
 def main():
-    tracker = WaterIntakeTracker()
-    tracker.set_goal(int(input("Set your daily water intake goal in ml: ")))
+    data = load_intake_log()
 
     while True:
-        action = input("\nChoose an action - Log (L), Check Goal (C), Exit (E): ").upper()
+        action = input("\nChoose an action - Set Goal (S), Log Intake (L), View Progress (V), Exit (E): ").upper()
 
-        if action == 'L':
-            amount = int(input("Enter the amount of water in ml you've just drunk: "))
-            tracker.log_intake(amount)
+        if action == 'S':
+            set_daily_goal(data)
 
-        elif action == 'C':
-            tracker.check_goal()
+        elif action == 'L':
+            log_water_intake(data)
+
+        elif action == 'V':
+            view_progress(data)
 
         elif action == 'E':
             break
