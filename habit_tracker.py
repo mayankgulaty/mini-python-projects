@@ -12,31 +12,50 @@ def save_habits(habits, filename='habits.json'):
     with open(filename, 'w') as file:
         json.dump(habits, file, indent=4)
 
-def log_habit(habits, habit_name):
-    today = datetime.now().strftime('%Y-%m-%d')
-    if habit_name not in habits:
-        habits[habit_name] = []
-    habits[habit_name].append(today)
-    save_habits(habits)
-    print(f"Habit '{habit_name}' logged for today.")
+def add_habit(habits):
+    habit_name = input("Enter the habit you want to track: ")
+    description = input("Enter a brief description of the habit: ")
 
-def view_habits(habits):
-    for habit_name, dates in habits.items():
-        streak = len(dates)
-        print(f"{habit_name}: {streak} day(s) - Dates: {', '.join(dates)}")
+    habits[habit_name] = {"description": description, "log": {}}
+    save_habits(habits)
+    print(f"Added habit: {habit_name}")
+
+def log_progress(habits):
+    habit_name = input("Enter the habit name: ")
+    date = datetime.now().strftime('%Y-%m-%d')
+    success = input("Did you perform this habit today? (yes/no): ").lower()
+
+    if habit_name in habits:
+        habits[habit_name]["log"][date] = success == 'yes'
+        save_habits(habits)
+        print(f"Logged progress for {habit_name}")
+    else:
+        print("Habit not found.")
+
+def view_streaks(habits):
+    for habit, details in habits.items():
+        streak = 0
+        for date, success in sorted(details["log"].items(), reverse=True):
+            if success:
+                streak += 1
+            else:
+                break
+        print(f"{habit}: Current streak is {streak} day(s)")
 
 def main():
     habits = load_habits()
 
     while True:
-        action = input("\nChoose an action - Log Habit (L), View Habits (V), Exit (E): ").upper()
+        action = input("\nChoose an action - Add Habit (A), Log Progress (L), View Streaks (V), Exit (E): ").upper()
 
-        if action == 'L':
-            habit_name = input("Enter the name of the habit to log: ")
-            log_habit(habits, habit_name)
+        if action == 'A':
+            add_habit(habits)
+
+        elif action == 'L':
+            log_progress(habits)
 
         elif action == 'V':
-            view_habits(habits)
+            view_streaks(habits)
 
         elif action == 'E':
             break
