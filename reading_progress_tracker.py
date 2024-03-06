@@ -1,57 +1,61 @@
 import json
 import os
-from datetime import datetime
 
-
-def load_reading_data(filename='reading_data.json'):
+def load_reading_list(filename='reading_list.json'):
     if os.path.exists(filename):
         with open(filename, 'r') as file:
             return json.load(file)
-    return {"books": {}, "logs": []}
+    return {'Want to Read': [], 'Currently Reading': [], 'Read': []}
 
-
-def save_reading_data(data, filename='reading_data.json'):
+def save_reading_list(reading_list, filename='reading_list.json'):
     with open(filename, 'w') as file:
-        json.dump(data, file, indent=4)
+        json.dump(reading_list, file, indent=4)
 
+def add_book(reading_list):
+    title = input("Enter the book title: ")
+    category = input("Enter the category (Want to Read, Currently Reading, Read): ")
+    if category in reading_list:
+        reading_list[category].append(title)
+        save_reading_list(reading_list)
+        print(f"'{title}' added to '{category}'.")
+    else:
+        print("Invalid category.")
 
-def add_reading_log(data):
-    book_title = input("Enter the book title: ")
-    pages_read = int(input("Enter the number of pages read: "))
-    date_read = datetime.now().strftime('%Y-%m-%d')
+def update_book_status(reading_list):
+    title = input("Enter the book title to update: ")
+    new_category = input("Enter the new category for the book (Want to Read, Currently Reading, Read): ")
+    for category in reading_list:
+        if title in reading_list[category]:
+            reading_list[category].remove(title)
+            reading_list[new_category].append(title)
+            save_reading_list(reading_list)
+            print(f"'{title}' moved to '{new_category}'.")
+            return
+    print("Book not found.")
 
-    if book_title not in data["books"]:
-        total_pages = int(input("Enter the total number of pages in the book: "))
-        data["books"][book_title] = {"total_pages": total_pages, "pages_read": 0}
-
-    data["books"][book_title]["pages_read"] += pages_read
-    data["logs"].append({"book_title": book_title, "pages_read": pages_read, "date": date_read})
-    save_reading_data(data)
-    print(f"Added {pages_read} pages to '{book_title}' reading log.")
-
-
-def view_progress(data):
-    for title, details in data["books"].items():
-        print(f"\n{title}: {details['pages_read']}/{details['total_pages']} pages read")
-        progress_percentage = (details['pages_read'] / details['total_pages']) * 100
-        print(f"Progress: {progress_percentage:.2f}%")
-
+def view_reading_list(reading_list):
+    for category, books in reading_list.items():
+        print(f"\n{category}:")
+        for book in books:
+            print(f"- {book}")
 
 def main():
-    data = load_reading_data()
+    reading_list = load_reading_list()
 
     while True:
-        action = input("\nChoose an action - Log Reading (L), View Progress (V), Exit (E): ").upper()
+        action = input("\nChoose an action - Add Book (A), Update Status (U), View List (V), Exit (E): ").upper()
 
-        if action == 'L':
-            add_reading_log(data)
+        if action == 'A':
+            add_book(reading_list)
+
+        elif action == 'U':
+            update_book_status(reading_list)
 
         elif action == 'V':
-            view_progress(data)
+            view_reading_list(reading_list)
 
         elif action == 'E':
             break
-
 
 if __name__ == "__main__":
     main()
